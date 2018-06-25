@@ -1,0 +1,80 @@
+---
+output:
+  md_document:
+    variant: markdown_github
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "README-",
+  message = FALSE, warning = FALSE, error = FALSE
+)
+```
+
+# phyloseqExtra
+
+PhyloseqExtra is a R package allows you to look at the phylogenic sequencing data in different phylogenic levels. As it iss named the core component of this package was built based on the [phyloseq](http://bioconductor.org/packages/release/bioc/html/phyloseq.html) package.
+
+## Install
+
+This package can be installed from github.
+
+```{r install}
+devtools::install_github("zhuchcn/phyloseqExtra")
+```
+
+## Create a SummarizedPhyloseq object
+
+The SummarizedPhyloseq is a S4 class inherits from the phyloseq-class from the phyloseq package also contains 7 additional slots from species to kingdom to store the summarized abundance table.
+
+```{r SummarizedPhyloseq}
+library(phyloseq); library(phyloseqExtra)
+data(fatigue)
+spy = summarizeFromPhyloseq(fatigue)
+spy
+```
+
+## Statistic analysis on all phylogenic levles
+
+We provides a encapsulated function to do statistic analysis using either DESeq2 or limma, and store the reults in a same structure as the SummarizedPhyloseq.
+
+```{r SummarizedPhyloStats}
+design = model.matrix(data = as(sample_data(fatigue), "data.frame"),
+                      ~Subject + 1)
+spys_de = spy_to_deseq2(spy, design, resultsName = "SubjectPatient")
+spys_de
+```
+
+## Cladogram with microbiomeViz
+
+Cladogram is a very useful visualization method for microbiome data with different phylogenic levels. Most current popular cladogram visualization tools are not able to use flexible statistic methods fo annotation. Here we provide a solution combining with the [microbiomeViz](https://github.com/lch14forever/microbiomeViz) package. Below is an example using the DESeq2 result to annotate the cladogram
+
+```{r cladogram,fig.width=10.5, fig.height = 7}
+library(ggplot2);library(microbiomeViz)
+tr = parsePhyloseq(fatigue, node.size.scale = 1.25)
+p = tree.backbone(tr, size=1)
+anno.data = create_annodata(spys_de, coef = "padj", cutoff = 0.05)
+p = clade.anno(p, anno.data)
+p
+```
+
+The cladogram is a ggplot object, so it can take the theme function from ggplot for further formating.
+
+```{r cladogram-formated, fig.width=10.5, fig.height = 7}
+p + geom_point(
+    data=data.frame(x=1:2,  y=1:2, color=c("Control","Patient")),
+    aes(x=x, y=y, color=color), size=0, stroke=0) +
+    guides(
+        color = guide_legend(
+            override.aes = list(size=3, color= rev(c("#00468BFF", "#ED0000FF")))
+        )) +
+    theme(
+    legend.text = element_text(size = 11),
+    plot.margin = margin(l=0, r=160, t=0, b=0)
+)
+```
+
