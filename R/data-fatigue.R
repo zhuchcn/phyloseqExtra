@@ -18,6 +18,7 @@
 #
 # sam_data = read.delim("data-raw/sample-metadata.tsv", comment.char = "", stringsAsFactors = F) %>% column_to_rownames("X.SampleID")
 # sam_data = sam_data[colnames(otu_table),]
+# sam_data$age_range = cut(sam_data$Age, breaks = c(19, 40, 55, 71), include.lowest = T)
 #
 # otu_table = otu_table(otu_table, taxa_are_rows = T)
 # tax_table = tax_table(as.matrix(tax_table))

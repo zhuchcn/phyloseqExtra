@@ -16,7 +16,10 @@ Imports:
 Suggests:
     limma,
     DESeq2,
-    microbiomeViz
+    microbiomeViz,
+    plotly,
+    knitr,
+    rmarkdown
 Collate:
     utils.R
     SummarizedPhyloseq-Class.R
@@ -30,7 +33,9 @@ Collate:
     microbiomeViz.R
     package.R
     data-fatigue.R
+    methods-plot.R
     test.R
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1
+VignetteBuilder: knitr

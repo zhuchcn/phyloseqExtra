@@ -125,3 +125,35 @@ setReplaceMethod(
         return(x)
     }
 )
+################################################################################
+setReplaceMethod(
+    "otu_table",
+    signature = "SummarizedPhyloseq",
+    definition = function(x, value){
+        x@otu_table <- value
+        validObject(x)
+        return(x)
+    }
+)
+################################################################################
+setGeneric("sample_data<-", function(x, value) standardGeneric("sample_data<-"))
+setReplaceMethod(
+    "sample_data",
+    signature = "SummarizedPhyloseq",
+    definition = function(x, value){
+        x@sam_data <- value
+        validObject(x)
+        return(x)
+    }
+)
+################################################################################
+setReplaceMethod(
+    "tax_table",
+    signature = "SummarizedPhyloseq",
+    definition = function(x, value){
+        x@tax_table <- value
+        validObject(x)
+        return(x)
+    }
+)
+

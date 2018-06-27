@@ -161,7 +161,7 @@ setMethod(
                               gsub("\\(\\)","",gsub("\\_"," ", lvl))),":"),
                               width = 15, side = "right"),
                           "[ ",
-                          str_pad(ntaxa(slt), width = 3, side="right"),
+                          str_pad(ntaxa(slt), width = 3, side="left"),
                           " taxa and ",
                           nsamples(slt), " samples ]\n", sep = ""))
             }

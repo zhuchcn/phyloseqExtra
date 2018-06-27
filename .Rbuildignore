@@ -5,3 +5,5 @@
 ^README-.*\.png$
 ^R/test\.R$
 ^\./R/test\.R$
+^README-img$
+^README-img/*\.png$

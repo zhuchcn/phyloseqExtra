@@ -1,16 +1,18 @@
 ---
-output:
-  md_document:
-    variant: markdown_github
+title: "phyloseqExtra basic usage"
+author: "Chenghao Zhu"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{phyloseqExtra basic usage}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
-```{r, echo = FALSE}
+```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.path = "README-",
   message = FALSE, warning = FALSE, error = FALSE,
   fig.height = 4, fig.width = 6, fig.align = "center"
 )
@@ -145,3 +147,4 @@ p + geom_point(
     plot.margin = margin(l=0, r=160, t=0, b=0)
 )
 ```
+

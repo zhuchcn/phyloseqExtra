@@ -45,10 +45,12 @@ summarize_taxa = function(physeq, level = "Family", keep_full_tax = TRUE){
         taxonomy = as.character(taxtab[,level])
     }
 
+    taxonomy[is.na(taxonomy)] = "NA"
+
     otutab %>%
         as.data.frame %>%
         mutate(taxonomy = taxonomy) %>%
-        filter(!is.na(taxonomy) & !grepl("\\|NA", taxonomy)) %>%
+        #filter(!is.na(taxonomy) & !grepl("\\|NA", taxonomy)) %>%
         melt(id.var = "taxonomy",
              variable.name = "sample_id") %>%
         group_by(taxonomy, sample_id) %>%
@@ -78,4 +80,9 @@ fix_duplicate_tax = function(physeq){
     }
     tax_table(physeq) = taxtab
     return(physeq)
+}
+
+################################################################################
+complete_phylo_levels = function(){
+    return(c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species"))
 }

@@ -10,15 +10,15 @@
 # p = tree.backbone(tr, size=1)
 #
 # spy = summarizeFromPhyloseq(physeq)
-# design = model.matrix(data = as(sample_data(physeq), "data.frame"),
-#                       ~Subject + 1)
+# design = model.matrix(data = as(sample_data(physeq_prop), "data.frame"),
+#                       ~Treatment*Timepoint + StudyID + 1)
 # spys_de = spy_to_deseq2(spy, design, resultsName = "SubjectPatient")
 #
 # # limma
 # physeq_prop = transform_sample_counts(physeq, function(x) x/sum(x))
 #
-# spy = summarizeFromPhyloseq(physeq_prop)
-# spys_lm = spy_to_limma(spy, design, transform = "log", p.value = 13, coef=13)
+# spy_ffs = summarizeFromPhyloseq(physeq_prop)
+# spys_ffs = spy_to_limma(spy_ffs, design, transform = "log", p.value = 13, coef=13)
 #
 #
 # anno.data = create_annodata(spys_de, coef = "pvalue", cutoff = 0.05)
