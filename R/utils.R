@@ -83,6 +83,10 @@ fix_duplicate_tax = function(physeq){
 }
 
 ################################################################################
+#' @keywords internal
 complete_phylo_levels = function(){
     return(c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species"))
 }
+################################################################################
+#' @keywords internal
+'%+%' = function(a, b) paste0(a, b)

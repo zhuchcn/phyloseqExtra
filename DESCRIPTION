@@ -1,6 +1,6 @@
-Package: phyloseqExtra
+Package: phyloX
 Type: Package
-Title: Provides additional functions for the phyloseq package
+Title: Analyzing and Visualization Microbiome Data on Different Phylogenic Levels
 Version: 0.1.0
 Author: Chenghao Zhu
 Maintainer: Chenghao Zhu <chhzhu@ucdavis.com>
@@ -19,7 +19,8 @@ Suggests:
     microbiomeViz,
     plotly,
     knitr,
-    rmarkdown
+    rmarkdown,
+    BiocStyle
 Collate:
     utils.R
     SummarizedPhyloseq-Class.R

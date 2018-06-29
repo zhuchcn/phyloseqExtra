@@ -1,4 +1,5 @@
-## load data, data from Giloteaux et al (2016)
+# # load data, data from Giloteaux et al (2016)
+# library(stringr);library(Biostrings);library(tibble);library(phyloseq);library(ape);library(devtools)
 # otu_table = read.delim(file = "data-raw/feature_table.tsv", skip = 1,
 #                        comment.char = "", stringsAsFactors = F)
 # rownames(otu_table) = str_c("OTU", str_pad(rownames(otu_table), width=3, pad="0"))
@@ -15,18 +16,22 @@
 # tax_table = as.data.frame(tax_table)
 # rownames(tax_table) = rownames(otu_table)
 # colnames(tax_table) = c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
-#
+# # writeXStringSet(refseq, "data-raw/refseq.fasta", format = "fasta", width = 1000)
 # sam_data = read.delim("data-raw/sample-metadata.tsv", comment.char = "", stringsAsFactors = F) %>% column_to_rownames("X.SampleID")
 # sam_data = sam_data[colnames(otu_table),]
 # sam_data$age_range = cut(sam_data$Age, breaks = c(19, 40, 55, 71), include.lowest = T)
+#
+# phy_tree = read.tree("data-raw/tree.nwk")
 #
 # otu_table = otu_table(otu_table, taxa_are_rows = T)
 # tax_table = tax_table(as.matrix(tax_table))
 #
 # sam_data = sample_data(sam_data)
 #
-# fatigue = phyloseq(otu_table, tax_table, sam_data, refseq)
+# fatigue = phyloseq(otu_table, tax_table, sam_data, refseq, phy_tree)
 # fatigue = fix_duplicate_tax(fatigue)
+#
+# use_data(fatigue, overwrite = TRUE)
 ################################################################################
 #' @title (Data) Chronic Fatigue Syndrome dataset
 #' @description

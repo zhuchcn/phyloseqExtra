@@ -141,6 +141,11 @@ plot_box = function(spy,
                     style         = "bw",
                     plotly        = FALSE){
 
+    if(length(by) > 3) stop("Group variable number must be <= 3")
+    if(!level %in% complete_phylo_levels())
+        stop(paste0("Invalid level. Must be one from ",
+                    paste(complete_phylo_levels(), collapse = ", ")))
+
     if(!is.null(line) & jitter != 0){
         stop("Can't draw lines with jittered points",
              call. = FALSE)
@@ -234,21 +239,72 @@ plot_box = function(spy,
 
     return(p)
 }
+################################################################################
+#' @title Generate a heatmap with all the taxa the match a given crateria from
+#' a given SummarizedPhyloseq Object.
+#' @description
+#' By specifying the phylogenic level, coeficient, and cutoff, all the taxa with
+#'  a adjusted or unadjusted p value that is smaller than the cutoff will be
+#'  selected. Then the summarized OTU table at the specifed level is extracted
+#'  to generate a heatmap.
+#'
+#' This function depends on the \code{\link{zheatmap}} package. The package can
+#' be installed from the github using \code{devtools::install_github("zhuchcn/zheatmap")}
+#' @author Chenghao Zhu
+#' @param spy SummarizedPhyloseq object
+#' @param spys SummarizedPhyloStats object
+#' @param level character variable indicates the targeted phylogenic level
+#' @param coef character, either "pvalue" or "padj"
+#' @param cutoff numeric, the cutoff of coef to use
+#' @param anno.var character, indicates the sample metadata variabel to use for
+#' annotation as a side bar. It must be one from the colnames of the sample data.
+#' @param ... other parameters supported by the \code{\link{zheatmap}} function.
+#' @seealso \code{\link{SummarizedPhyloseq-class}}, \code{\link{SummarizedPhyloStats-class}}, \code{\link{zheatmap}}
+#' @examples
+#' data(fatigue)
+#' fatigue = transform_sample_counts(fatigue, function(x) x/sum(x))
+#' spy = summarizeFromPhyloseq(fatigue)
+#' design = model.matrix(data = as(sample_data(fatigue), "data.frame"), ~Subject + 1)
+#' spys_lm = spy_to_limma(spy_prop, design, transform = "log", p.value = 2, coef = 2)
+#' plot_heatmap(spy,
+#'              spys_lm,
+#'              coef = "pvalue",
+#'              cutoff = 0.1,
+#'              anno.var = "Subject")
+#' @export
+plot_heatmap = function(spy,
+                        spys,
+                        level = "Genus",
+                        coef = "pvalue",
+                        cutoff = 0.05,
+                        anno.var,
+                        ...
+){
+    if (!requireNamespace("zheatmap", quietly = TRUE)) {
+        stop("The \"zheatmap\" package is required for this funciton. Please install it.")
+    }
 
+    if(!level %in% complete_phylo_levels())
+        stop(paste0("Invalid level. Must be one from ",
+                    paste(complete_phylo_levels(), collapse = ", ")))
 
+    otutab = eval(parse(text = paste0(tolower(level), "_table(spy)"))) %>%
+        as.data.frame
+    statab = eval(parse(text = paste0(tolower(level), "_table(spys)"))) %>%
+        as.data.frame
+    samtab = as(sample_data(spy), "data.frame")
 
+    otu.list = statab %>%
+        rownames_to_column("OTU") %>%
+        filter_at(vars(coef), any_vars( . <= cutoff)) %>%
+        filter(OTU != "NA") %>%
+        select("OTU")
 
+    data = as.data.frame(otutab[otu.list$OTU,])
 
+    colSideBar = if(!missing(anno.var)) samtab[,anno.var] else NULL
 
-
-
-
-
-
-
-
-
-
-
-
-
+    zheatmap::zheatmap(data = data,
+                       colSideBar = colSideBar,
+                       ...)
+}
