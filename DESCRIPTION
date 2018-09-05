@@ -1,4 +1,4 @@
-Package: phyloX
+Package: phylox
 Type: Package
 Title: Analyzing and Visualization Microbiome Data on Different Phylogenic Levels
 Version: 0.1.0
@@ -25,12 +25,12 @@ Collate:
     utils.R
     SummarizedPhyloseq-Class.R
     SummarizedPhyloseq-Assessor.R
-    SummarizedPhyloseq-Assignment.R
-    method-show.R
+    methods-show.R
     SummarizedPhyloStats-Class.R
     SummarizedPhyloStats-Assessor.R
-    SummarizedPhyloStats-Assignment.R
+    methods.R
     phyloseq_to_stats.R
+    to-Metabase.R
     microbiomeViz.R
     package.R
     data-fatigue.R
@@ -38,5 +38,5 @@ Collate:
     test.R
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0
 VignetteBuilder: knitr

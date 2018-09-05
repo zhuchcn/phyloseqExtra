@@ -26,13 +26,7 @@
 #' plot_bar(spy, "Genus", by = c("Subject", "Sex"))
 #' plot_bar(spy, "Genus", by = c("Subject", "Sex"), plotly = T)
 #' plot_bar(spy, "Phylum", by = c("Subject", "age_range", "Sex"))
-plot_bar = function(spy, level="Phylum", by = NULL, show.legend = TRUE, plotly = FALSE){
-    if(plotly){
-        if (!requireNamespace("plotly", quietly = TRUE)) {
-            warning("Failed to load the \"plotly\" package.")
-            plotly = FALSE
-        }
-    }
+plot_bar = function(spy, level="Phylum", by = NULL, show.legend = TRUE){
 
     # check auguments
     if(is.null(by)) by = "sample_id"
@@ -79,7 +73,6 @@ plot_bar = function(spy, level="Phylum", by = NULL, show.legend = TRUE, plotly =
     if(!show.legend){
         p = p + theme(legend.position = "none")
     }
-    if(plotly) p = plotly::ggplotly(p)
     p
 }
 ################################################################################
@@ -122,122 +115,38 @@ plot_bar = function(spy, level="Phylum", by = NULL, show.legend = TRUE, plotly =
 #' plot_box(spy, level = "Genus", taxon = "g__Ruminococcus", by = "Subject", jitter = 0.15)
 #' plot_box(spy, level = "Genus", taxon = "g__Ruminococcus", by = c("Subject","Sex"), box.size = 1, whisker.size = 1, show.points = F, style = "academic")
 #' plot_box(spy, level = "Genus", taxon = "g__Ruminococcus", by = c("Subject","Sex"), jitter = 0.15, box.size = 1, whisker.size = 1, point.alpha = 0.75, point.color = "steelblue", style = "academic")
-plot_box = function(spy,
-                    level         = "Family",
-                    taxon         = NULL,
-                    by            = NULL,
-                    show.points   = TRUE,
-                    line          = NULL,
-                    color.by      = NULL,
-                    jitter        = 0,
-                    box.size      = 0.5,
-                    whisker.size  = 0.5,
-                    whisker.width = 0.5,
-                    point.size    = 3,
-                    point.alpha   = 0.5,
-                    point.color   = "black",
-                    color.pal     = NULL,
-                    show.legend   = TRUE,
-                    style         = "bw",
-                    plotly        = FALSE){
+plot_boxplot = function(spy, level, taxon, x, rows, cols, line, color, ...){
 
-    if(length(by) > 3) stop("Group variable number must be <= 3")
-    if(!level %in% complete_phylo_levels())
-        stop(paste0("Invalid level. Must be one from ",
-                    paste(complete_phylo_levels(), collapse = ", ")))
-
-    if(!is.null(line) & jitter != 0){
-        stop("Can't draw lines with jittered points",
+    if(!requireNamespace("ggmetaplots")){
+        stop("[ phylox: PackageNotFound ] Can't find the ggmetaplot package. Please install it using:\n\n    devtools::install_github('zhuchcn/ggmetaplot')",
              call. = FALSE)
     }
-    if(plotly){
-        if (!requireNamespace("plotly", quietly = TRUE)) {
-            warning("Failed to load the \"plotly\" package.")
-            plotly = FALSE
-        }
-    }
 
-    sam_vars = unique(c(by, line, color.by))
+    level_list = complete_phylo_levels() %>% tolower()
+    level = tolower(level)
 
-    slot = eval(parse(text = paste0(tolower(level), "_table(spy)"))) %>%
-        as.data.frame
-    sam_data = as(sample_data(spy), "data.frame")
-    slot = slot[,rownames(sam_data)]
+    if(!level %in% level_list)
+        stop(paste0("[ phylox ]Invalid level. Must be one from ",
+                    paste(level_list, collapse = ", ")))
 
-    df = sam_data %>%
-        rownames_to_column("sample_id") %>%
-        select(c("sample_id", sam_vars)) %>%
-        mutate(Abundance = as.numeric(slot[taxon,]))
+    args = as.list(match.call())[-c(1:3)]
+    names(args)[names(args) == "taxon"] = "y"
 
-    # points
-    my_geom_point = function(){
-        if(is.null(color.by)){
-            geom_point(size = point.size, alpha = point.alpha,
-                       color = point.color,
-                       position = position_jitter(w=jitter))
-        }else{
-            geom_point(aes_string(color = color.by),
-                       size = point.size, alpha = point.alpha,
-                       position = position_jitter(w=jitter))
-        }
-    }
-    # define the theme function
-    my_theme = function(){
-        if(style == "bw"){
-            theme_bw() +
-                theme(
-                    strip.text = element_text(size = 13)
-                )
-        }else if(style == "academic"){
-            theme_classic() +
-            theme (
-                panel.border = element_rect(size = 1 , fill = NA),
-                strip.text   = element_text(size = 13),
-                axis.text.x  = element_text(size = 12, color = "black"),
-                axis.text.y  = element_text(size = 11, color = "black"),
-                axis.ticks   = element_line(size = 1 , color = "black"),
-                axis.title.x = element_text(size = 15, vjust = -2),
-                axis.title.y = element_text(size = 15, vjust = 2),
-                plot.margin  = margin(l = 15,  b = 15,
-                                      t = 10,  r = 10, unit  = "pt")
-            )
-        }
-    }
+    sample_vars = unique(c(args$x, args$rows, args$cols, args$color, args$line))
 
-    # to do: add point.color
-    p = ggplot(df,aes_string(x = by[1], y = "Abundance")) +
-        geom_boxplot(outlier.shape = NA, size = box.size) +
-        stat_boxplot(geom = "errorbar", width = whisker.width,
-                     size = whisker.size) +
-        my_theme()
-    # show points
-    if(show.points){
-        p = p + my_geom_point()
-    }
+    level_list = paste0(level_list, "_table")
+    names(level_list) = tolower(complete_phylo_levels())
 
-    # line
-    if(!is.null(line))
-        p = p + geom_line(aes_string(group = line, color = color.by))
-    # facet
-    if(length(by) == 2 ){
-        p = p + facet_grid(rows = by[2])
-    }else if(length(by) == 3){
-        p = p + facet_grid(rows = by[2], cols = by[3])
-    }
-    # color panel
-    if(!is.null(color.pal)){
-        col_num = length(unique(df[,color]))
-        mypal = colorRampPalette(colors = color.pal)
-        p = p + scale_color_manual(
-            values = mypal(col_num))
-    }
-    # hide legend
-    if(!show.legend)
-        p = p + theme(legend.position = "none")
-    # plotly
-    if(plotly) p = plotly::ggplotly(p)
+    df = data.frame(
+        abundance = as.numeric(spy[[level_list[level]]][taxon,])
+    ) %>%
+        cbind(spy@sam_data[,sample_vars])
+    colnames(df)[-1] = sample_vars
 
-    return(p)
+    args$data = df
+    args$y = "abundance"
+
+    do.call(ggmetaplots::ggboxplot, args)
 }
 ################################################################################
 #' @title Generate a heatmap with all the taxa the match a given crateria from
@@ -281,7 +190,7 @@ plot_heatmap = function(spy,
                         ...
 ){
     if (!requireNamespace("zheatmap", quietly = TRUE)) {
-        stop("The \"zheatmap\" package is required for this funciton. Please install it.")
+        stop("[ phylox: PackageNotFound ] The \"zheatmap\" package is required for this funciton. Please install it.")
     }
 
     if(!level %in% complete_phylo_levels())

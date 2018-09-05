@@ -5,8 +5,8 @@
 \title{Generate a heatmap with all the taxa the match a given crateria from
 a given SummarizedPhyloseq Object.}
 \usage{
-plot_heatmap(spy, spys, level = "Genus", coef = "pvalue", cutoff = 0.05,
-  anno.var, ...)
+plot_heatmap(spy, spys, level = "Genus", coef = "pvalue",
+  cutoff = 0.05, anno.var, ...)
 }
 \arguments{
 \item{spy}{SummarizedPhyloseq object}

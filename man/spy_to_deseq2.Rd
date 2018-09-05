@@ -13,10 +13,10 @@ spy_to_deseq2(spy, design, resultsName, ...)
 corresponding to sample IDs and columns to coefficients to be estimated.
 This can be constructed using \code{\link{model.matrix}} function}
 
-\item{resultsName}{The name of the coefficient (variable) for building the
-results tables. The value provided must be one of the colnames of the design
-matrix. This argument is corresponding to the \code{name} in the
-\code{\link{results}} from the DESeq2 package.}
+\item{resultsName}{The index or name of the coefficient (variable) for
+building the results tables. The value provided must be one of the colnames
+of the design matrix. This argument is corresponding to the \code{name} in
+the \code{\link{results}} from the DESeq2 package.}
 
 \item{...}{(optional) Other parameters to be parsed to the
 \code{\link{DESeq}} function}

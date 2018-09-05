@@ -10,10 +10,10 @@
 #' @param design (required) The design matrix of the experiment, with rows
 #' corresponding to sample IDs and columns to coefficients to be estimated.
 #' This can be constructed using \code{\link{model.matrix}} function
-#' @param resultsName The name of the coefficient (variable) for building the
-#' results tables. The value provided must be one of the colnames of the design
-#' matrix. This argument is corresponding to the \code{name} in the
-#' \code{\link{results}} from the DESeq2 package.
+#' @param resultsName The index or name of the coefficient (variable) for
+#' building the results tables. The value provided must be one of the colnames
+#' of the design matrix. This argument is corresponding to the \code{name} in
+#' the \code{\link{results}} from the DESeq2 package.
 #' @param ... (optional) Other parameters to be parsed to the
 #' \code{\link{DESeq}} function
 #' @author Chenghao Zhu
@@ -23,6 +23,10 @@ spy_to_deseq2 = function(spy, design, resultsName, ...){
         stop("Package \"DESeq2\" needed for this function to work. Please install it.",
              call. = FALSE)
     }
+    if(is.character(resultsName)){
+        resultsName = gsub("\\:","\\.",resultsName)
+    }
+
     sample_data = sample_data(spy)
     splat_list = splat_phyloseq_objects(spy)
     splat_list = splat_list[sapply(splat_list, class) == "otu_table" & !is.na(splat_list)]
@@ -30,7 +34,12 @@ spy_to_deseq2 = function(spy, design, resultsName, ...){
         ps = phyloseq(table, sample_data)
         de = phyloseq_to_deseq2(ps, design)
         de = DESeq2::DESeq(de, ...)
-        res = as.data.frame(DESeq2::results(de, name = resultsName))
+        if(is.numeric(resultsName)){
+            name = DESeq2::resultsNames(de)[resultsName]
+        }else{
+            name = resultsName
+        }
+        res = as.data.frame(DESeq2::results(de, name = name))
         res = res[,c("baseMean", "log2FoldChange", "stat", "pvalue", "padj")]
         names(res) = c("baseMean", "logFC", "stat", "pvalue", "padj")
         return(res)
@@ -63,23 +72,17 @@ spy_to_deseq2 = function(spy, design, resultsName, ...){
 #' @author Chenghao Zhu
 #' @export
 
-spy_to_limma = function(spy, design, transform = c("log", "none"), coef, p.value, ...){
+spy_to_limma = function(spy, design, transform = function(x){log2(x+1)}, coef, p.value, ...){
     if (!requireNamespace("limma", quietly = TRUE)) {
         stop("Package \"limma\" needed for this function to work. Please install it.",
              call. = FALSE)
-    }
-    transform = match.arg(transform)
-    if(transform == "log"){
-        transform = function(x) log(x + 1)
-    }else{
-        transform = I
     }
 
     sample_data = sample_data(spy)
     splat_list = splat_phyloseq_objects(spy)
     splat_list = splat_list[sapply(splat_list, class) == "otu_table" & !is.na(splat_list)]
     result_list = lapply(splat_list, function(table){
-        otu = as.data.frame(table)
+        otu = as.data.frame(transform(table))
         fit = limma::lmFit(otu, design)
         fit_ebayes = limma::eBayes(fit)
         res = limma::topTable(fit_ebayes, sort.by = "none", number = nrow(otu),

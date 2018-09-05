@@ -1,5 +1,5 @@
 ################################################################################
-#' phylor
+#' phylox
 #'
 #' This package allows you to store, handle, and analyz high-throughput p
 #' hylogenic sequencing data in different phylogenic level. The the core
@@ -13,7 +13,7 @@
 #' the results are stored in the SummarizedPhyloStats class.
 #'
 #' @import methods
-#' @name phyloX-package
+#' @name phylox-package
 #' @author Chenghao Zhu \email{chhzhu@@ucdavis.edu}
 #' @docType package
 #' @keywords package

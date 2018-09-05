@@ -4,7 +4,8 @@
 \alias{spy_to_limma}
 \title{Linear model using limma on different phylogenic levels}
 \usage{
-spy_to_limma(spy, design, transform = c("log", "none"), coef, p.value, ...)
+spy_to_limma(spy, design, transform = function(x) {     log2(x + 1) },
+  coef, p.value, ...)
 }
 \arguments{
 \item{spy}{(required) \code{\link{SummarizedPhyloseq-class}}}

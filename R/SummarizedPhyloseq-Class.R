@@ -105,12 +105,9 @@ setClass(
 #' data(GlobalPatterns)
 #' spy = summarizedFromPhyloseq(GlobalPatterns)
 summarizeFromPhyloseq <- function(physeq, level = "all"){
-    if( length(level) == 1 & "all" %in% level){
-        level = c("Kingdom", "Phylum", "Class", "Order",
-                  "Family", "Genus", "Species")
-    }
     all_levels = c("Kingdom", "Phylum", "Class", "Order",
                    "Family", "Genus", "Species")
+    if( length(level) == 1 & "all" %in% level) level = all_levels
 
     summarizedPhyseq = lapply(level, function(lvl){
         otu_table = summarize_taxa(physeq, level = lvl,
@@ -136,39 +133,13 @@ summarizeFromPhyloseq <- function(physeq, level = "all"){
         family_table  = Family,
         genus_table   = Genus,
         species_table = Species,
-        otu_table     = otu_table(physeq),
-        tax_table     = tax_table(physeq),
-        sam_data      = sample_data(physeq))
+        otu_table     = physeq@otu_table,
+        tax_table     = physeq@tax_table,
+        sam_data      = physeq@sam_data,
+        phy_tree      = physeq@phy_tree,
+        refseq        = physeq@refseq)
 }
-################################################################################
-#' @inheritParams methods::show
-#' @import stringr
-#' @export
-setMethod(
-    "show",
-    signature = "SummarizedPhyloseq",
-    definition = function(object){
-        cat(">>>>>>>>>>>>>>>> summarized phyloseq object <<<<<<<<<<<<<<<<\n\n")
-        show(as(object, "phyloseq"))
-        levels = c("kingdom_table", "phylum_table", "class_table", "order_table",
-                   "family_table", "genus_table", "species_table")
-        cat("\nphyloseq extra slots:\n")
-        for(lvl in levels){
-            slt = eval(parse(text = paste0("object@", lvl)))
-            if(!is.null(slt)){
-                cat(paste(str_pad(paste0(lvl, "()"), width=18, side="right"),
-                          str_pad(paste0(str_to_title(
-                              gsub("\\(\\)","",gsub("\\_"," ", lvl))),":"),
-                              width = 15, side = "right"),
-                          "[ ",
-                          str_pad(ntaxa(slt), width = 3, side="left"),
-                          " taxa and ",
-                          nsamples(slt), " samples ]\n", sep = ""))
-            }
-        }
-        cat("\n>>>>>>>>>>>>>>>> SummarizedPhyloseq-Class <<<<<<<<<<<<<<<<")
-    }
-)
+
 ################################################################################
 ## This validity method checks if the summarized slots have the same sample
 ## names as the sam_data

@@ -1,4 +1,34 @@
 ################################################################################
+#' @inheritParams methods::show
+#' @import stringr
+#' @export
+setMethod(
+    "show",
+    signature = "SummarizedPhyloseq",
+    definition = function(object){
+        cat(">>>>>>>>>>>>>>>> summarized phyloseq object <<<<<<<<<<<<<<<<\n\n")
+        show(as(object, "phyloseq"))
+        levels = c("kingdom_table", "phylum_table", "class_table", "order_table",
+                   "family_table", "genus_table", "species_table")
+        cat("\nphyloseq extra slots:\n")
+        for(lvl in levels){
+            slt = eval(parse(text = paste0("object@", lvl)))
+            if(!is.null(slt)){
+                cat(paste(str_pad(paste0(lvl, "()"), width=18, side="right"),
+                          str_pad(paste0(str_to_title(
+                              gsub("\\(\\)","",gsub("\\_"," ", lvl))),":"),
+                              width = 15, side = "right"),
+                          "[ ",
+                          str_pad(ntaxa(slt), width = 3, side="left"),
+                          " taxa and ",
+                          nsamples(slt), " samples ]\n", sep = ""))
+            }
+        }
+        cat("\n>>>>>>>>>>>>>>>> SummarizedPhyloseq-Class <<<<<<<<<<<<<<<<")
+    }
+)
+################################################################################
+#' @inheritParams methods::show
 #' @export
 setMethod(
     "show",
@@ -32,6 +62,7 @@ setMethod(
     }
 )
 ################################################################################
+#' @inheritParams methods::show
 #' @export
 setMethod(
     "show",
@@ -66,6 +97,7 @@ setMethod(
     }
 )
 ################################################################################
+#' @inheritParams methods::show
 #' @export
 setMethod(
     "show",

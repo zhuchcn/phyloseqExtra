@@ -4,8 +4,7 @@
 \alias{plot_bar}
 \title{Stacked bar plot for SummarizedPhyloseq data}
 \usage{
-plot_bar(spy, level = "Phylum", by = NULL, show.legend = TRUE,
-  plotly = FALSE)
+plot_bar(spy, level = "Phylum", by = NULL, show.legend = TRUE)
 }
 \arguments{
 \item{spy}{\code{\link{SummarizedPhyloseq-class}}}
@@ -18,9 +17,9 @@ abundance data againt to. It must be from the sample data's column names.
 If multiple variables are givin, facets will be used. The default is
 sample name. See examples.}
 
-\item{plotly}{Logical value. If TRUE, a plotly variable will be returned.}
-
 \item{legend.show}{Logical variable whether to show the legends.}
+
+\item{plotly}{Logical value. If TRUE, a plotly variable will be returned.}
 }
 \description{
 This function uses the ggplot2 package to generate barplot from a given
