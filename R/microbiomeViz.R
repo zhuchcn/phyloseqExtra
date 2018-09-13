@@ -27,12 +27,15 @@ create_annodata = function(spys, coef = c("pvalue", "padj"), cutoff = 0.05, colo
     splat_list = splat_phyloseq_objects(spys)
     has_prefix = grepl("^[kpcofgs]{1}__",rownames(splat_list[[1]])[1])
     for(slot in names(splat_list)){
+
         if(!slot %in% levels) next
         if(is.na(splat_list[slot])) next
+
         slot_sub = splat_list[[slot]]%>%
             rownames_to_column("node") %>%
-            filter(eval(parse(text = paste0("!is.na(", coef, ") &",
-                                            coef, "<=", cutoff))))
+            filter(!is.na(!!sym(coef)) & !!sym(coef) <= cutoff) %>%
+            filter(!is.na(node) & node != "NA")
+
         if(!has_prefix){
             slot_sub = mutate(
                 slot_sub,
